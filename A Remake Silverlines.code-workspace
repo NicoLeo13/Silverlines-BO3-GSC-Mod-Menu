@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "../A Remake Sliverlines - T7 Compiler"
+			// "settings": {
+			// 	"search.exclude": {
+			// 		"**/scripts": true,         // Excludes scripts Multi Root Folder from search
+			// 		// "./../../t7-source-main/t7-source-main/scripts": true,         // Excludes scripts Multi Root Folder from search
+			// 	}
+			// }
+		},
+		{
+			"path": "../../t7-source-main/t7-source-main/scripts", 
+			"name": "T7 - Source",
+		}
+		
+	],
+	// "settings": {
+	// 	"search.exclude": {
+	// 		"T7 - Source": true,
+	// 	}
+	// }
+}
