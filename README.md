@@ -3,7 +3,7 @@
     <b><a href="https://github.com/NicoLeo13/Silverlines-BO3-GSC-Mod-Menu.git">Silverlines - BO3-ZM GSC Mod Menu</a></b>
 </h1>
 
-![GitHub repo size](https://img.shields.io/github/repo-size/NicoLeo13/https%3A%2F%2Fgithub.com%2FNicoLeo13%2FSilverlines-BO3-GSC-Mod-Menu.git)
+![GitHub repo size](https://img.shields.io/github/repo-size/NicoLeo13/Silverlines-BO3-GSC-Mod-Menu)
 This is my unfinished GSC Mod Menu for BO3-ZM. It has some nice features and menu customizations, but a lot of stuff i had planed is unfinished.
 
 I hope other devs find it useful thus why i'm releasing the source :)
