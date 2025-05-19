@@ -4,7 +4,7 @@ CustomFxPlayer(fx, delete)
 	{
 		for(i = 0; i < level.customFxSpawned.size; i++)
 		{
-			self iPrintLnBold(i);
+			// self iPrintLnBold(i);
 			level.customFxSpawned[i] delete();
 		}
 		level.customFxOrigin delete();

@@ -44,6 +44,7 @@ DoBackgroundSize()
 {
     // self.menu[HUD]["Background"] = createRectangle("TOPRIGHT", "TOPRIGHT", -10, 100, 200, 140, self.menu[COLOR]["Background"], 0, 0, "white");
     HUD = "hud";
+    self CheckEmptyOptions();
     menuSize = self.menu["items"][self getCurrentMenu()].name.size;
 
     if(menuSize != self.menu["LastMenuSize"][self getCurrentMenu()] && isDefined(self.menu["LastMenuSize"][self getCurrentMenu()]))

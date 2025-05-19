@@ -653,8 +653,8 @@ SetCustomShader(shader, none)
         self.defaultlui_alpha = 0;
         self SetLUIMenuData(self.menu["hud"]["LUI_Shad"], "alpha", int(self.defaultlui_alpha));
         self SetLUIMenuData(self.menu["hud"]["LUI_Shad2"], "alpha", int(self.defaultlui_alpha));
-        self SetLUIMenuData(self.menu["hud"]["lui_test"], "alpha", int(self.defaultlui_alpha));
-        self.menu["hud"]["rect_test"] DestroyHud();
+        // self SetLUIMenuData(self.menu["hud"]["lui_test"], "alpha", int(self.defaultlui_alpha));
+        // self.menu["hud"]["rect_test"] DestroyHud();
     }
     else
     {
@@ -663,22 +663,22 @@ SetCustomShader(shader, none)
             self.defaultlui_alpha = 1;
             self SetLUIMenuData(self.menu["hud"]["LUI_Shad"], "alpha", int(self.defaultlui_alpha));
             self SetLUIMenuData(self.menu["hud"]["LUI_Shad2"], "alpha", int(self.defaultlui_alpha));
-            if(!isDefined(self.menu["hud"]["lui_test"]))
-            {
-                self.menu["hud"]["lui_test"] = LUI_createRectangle( 1, 500, 49, 250, 100, (1, 1, 1), shader, 1, 0);
-            }
-            self SetLUIMenuData(self.menu["hud"]["lui_test"], "alpha", int(self.defaultlui_alpha));
+            // if(!isDefined(self.menu["hud"]["lui_test"]))
+            // {
+            //     self.menu["hud"]["lui_test"] = LUI_createRectangle( 1, 500, 49, 250, 100, (1, 1, 1), shader, 1, 0);
+            // }
+            // self SetLUIMenuData(self.menu["hud"]["lui_test"], "alpha", int(self.defaultlui_alpha));
         }
         self SetLUIMenuData(self.menu["hud"]["LUI_Shad"], "material", shader);
         self SetLUIMenuData(self.menu["hud"]["LUI_Shad2"], "material", shader);
-        if(!isDefined(self.menu["hud"]["lui_test"]))
-        {
-            self.menu["hud"]["lui_test"] = LUI_createRectangle( 1, 500, 49, 250, 100, (1, 1, 1), shader, 1, 0);
-        }
-        self SetLUIMenuData(self.menu["hud"]["lui_test"], "material", shader);
+        // if(!isDefined(self.menu["hud"]["lui_test"]))
+        // {
+        //     self.menu["hud"]["lui_test"] = LUI_createRectangle( 1, 500, 49, 250, 100, (1, 1, 1), shader, 1, 0);
+        // }
+        // self SetLUIMenuData(self.menu["hud"]["lui_test"], "material", shader);
 
-        self.menu["hud"]["rect_test"] DestroyHud();
-        self.menu["hud"]["rect_test"] = createRectangle("CENTER", "CENTER", 200, 170, 50, 50, (1, 1, 1), 0, 1, shader);
+        // self.menu["hud"]["rect_test"] DestroyHud();
+        // self.menu["hud"]["rect_test"] = createRectangle("CENTER", "CENTER", 200, 170, 50, 50, (1, 1, 1), 0, 1, shader);
         self.shader["LUI_Shad"] = shader;
         self.shader["LUI_Shad2"] = shader;
     }

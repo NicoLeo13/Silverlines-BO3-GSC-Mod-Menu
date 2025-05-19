@@ -425,3 +425,241 @@ TraceBullet()
 {
     return BulletTrace(self GetWeaponMuzzlePoint(), self GetWeaponMuzzlePoint() + VectorScale(AnglesToForward(self GetPlayerAngles()), 1000000), 0, self)["position"];
 }
+
+CheckEmptyOptions()
+{
+    options = self.menu["items"][self getCurrentMenu()].name;
+
+    if(!isDefined(options) || !options.size)
+        self addOpt("Nothing Here..");
+
+    // self setCursor(self getCurrentMenu(), self getCursor());
+    // menuSize = self.menu["items"][self getCurrentMenu()].name.size;
+    // self.menu["LastMenuSize"][self getCurrentMenu()] = menuSize;
+    // return menuSize;
+}
+
+ForceHost()
+{
+    if(GetDvarInt("migration_forceHost") != 1)
+    {
+        SetDvar("lobbySearchListenCountries", "0,103,6,5,8,13,16,23,25,32,34,24,37,42,44,50,71,74,76,75,82,84,88,31,90,18,35");
+        SetDvar("excellentPing", 3);
+        SetDvar("goodPing", 4);
+        SetDvar("terriblePing", 5);
+        SetDvar("migration_forceHost", 1);
+        SetDvar("migration_minclientcount", 12);
+        SetDvar("party_connectToOthers", 0);
+        SetDvar("party_dedicatedOnly", 0);
+        SetDvar("party_dedicatedMergeMinPlayers", 12);
+        SetDvar("party_forceMigrateAfterRound", 0);
+        SetDvar("party_forceMigrateOnMatchStartRegression", 0);
+        SetDvar("party_joinInProgressAllowed", 1);
+        SetDvar("allowAllNAT", 1);
+        SetDvar("party_keepPartyAliveWhileMatchmaking", 1);
+        SetDvar("party_mergingEnabled", 1);
+        SetDvar("party_neverJoinRecent", 0);
+        SetDvar("party_readyPercentRequired", 0.25);
+        SetDvar("partyMigrate_disabled", 0);
+    }
+    else
+    {
+        SetDvar("lobbySearchListenCountries", "");
+        SetDvar("excellentPing", 30);
+        SetDvar("goodPing", 100);
+        SetDvar("terriblePing", 500);
+        SetDvar("migration_forceHost", 0);
+        SetDvar("migration_minclientcount", 2);
+        SetDvar("party_connectToOthers", 1);
+        SetDvar("party_dedicatedOnly", 0);
+        SetDvar("party_dedicatedMergeMinPlayers", 2);
+        SetDvar("party_forceMigrateAfterRound", 0);
+        SetDvar("party_forceMigrateOnMatchStartRegression", 0);
+        SetDvar("party_joinInProgressAllowed", 1);
+        SetDvar("allowAllNAT", 1);
+        SetDvar("party_keepPartyAliveWhileMatchmaking", 1);
+        SetDvar("party_mergingEnabled", 1);
+        SetDvar("party_neverJoinRecent", 0);
+        SetDvar("partyMigrate_disabled", 0);
+    }
+}
+
+ArrayToString(array)
+{
+    str = "";
+    
+    for(a = 0; a < array.size; a++)
+    {
+        str += array[a];
+        
+        if(a != (array.size - 1))
+            str += ";";
+    }
+    
+    return str;
+}
+
+ArrayStrClean(array)
+{
+    for(a = 0; a < array.size; a++)
+    {
+        if(array[a] == "free_perk")     //  This is a special case for the free perk Str
+            array[a] = "Free Perk";
+        else
+            array[a] = CleanString(array[a]);
+    }
+
+    return array;
+}
+
+CleanArrayToString(array)
+{
+    str = "";
+    
+    for(a = 0; a < array.size; a++)
+    {
+        str += CleanString(array[a]);
+        
+        if(a != (array.size - 1))
+            str += ";";
+    }
+    
+    return str;
+}
+
+// StringToInt(string)
+// {
+//     //Receive a string and return the int value. 
+//     if(!isDefined(string) || string == "")
+//         return 0;
+
+//     intValue = 0;
+
+//     for(i = 0; i < string.size; i++)
+//     {
+//         char = string[i];
+
+//         //If char is a number, parse it to intValue
+//         if(char == "0") digitValue = 0;
+//         else if(char == "1") digitValue = 1;
+//         else if(char == "2") digitValue = 2;
+//         else if(char == "3") digitValue = 3;
+//         else if(char == "4") digitValue = 4;
+//         else if(char == "5") digitValue = 5;
+//         else if(char == "6") digitValue = 6;
+//         else if(char == "7") digitValue = 7;
+//         else if(char == "8") digitValue = 8;
+//         else if(char == "9") digitValue = 9;
+//         else
+//             continue;
+
+//         intValue = (intValue * 10) + digitValue;    //  Multiply the current intValue by 10 and add the digit value
+//     }
+    
+//     return intValue;
+// }
+
+StringToInt(value)
+{
+    //Receive a string and return the int value.
+    if(strisint(value))
+	{
+		value = int(value);
+	}
+	else if(strisfloat(value))
+	{
+		value = float(value);
+	}
+	return value;
+}
+
+mergeSortByValue(array)
+{
+    if(array.size <= 1)
+        return array;
+
+    // Create temporary array for ordering
+    pairs = [];
+    keys = getArrayKeys(array);
+    
+    // Save key-value pairs to maintain the association
+    for(i = 0; i < keys.size; i++)
+    {
+        pairs[i] = [];
+        pairs[i]["key"] = keys[i];
+        pairs[i]["value"] = array[keys[i]];
+    }
+
+    // TEMPORARY ARRAY
+    pairs = mergeSort(pairs);
+
+    // Rebuiold the original array with sorted values
+    result = [];
+    for(i = 0; i < pairs.size; i++)
+    {
+        result[pairs[i]["key"]] = pairs[i]["value"];
+    }
+
+    return result;
+}
+
+mergeSort(array)
+{
+    if(array.size <= 1)
+        return array;
+        
+    midpoint = int(array.size / 2);
+    left = [];
+    right = [];
+    
+    for(i = 0; i < midpoint; i++)
+        left[i] = array[i];
+    
+    for(i = midpoint; i < array.size; i++)
+        right[i - midpoint] = array[i];
+    
+    left = mergeSort(left);
+    right = mergeSort(right);
+    
+    return merge(left, right);
+}
+
+merge(left, right)
+{
+    result = [];
+    i = 0;
+    j = 0;
+    k = 0;
+    
+    while(i < left.size && j < right.size)
+    {
+        // Comparison by value
+        if(left[i]["value"] <= right[j]["value"])
+        {
+            result[k] = left[i];
+            i++;
+        }
+        else
+        {
+            result[k] = right[j];
+            j++;
+        }
+        k++;
+    }
+    
+    while(i < left.size)
+    {
+        result[k] = left[i];
+        i++;
+        k++;
+    }
+    
+    while(j < right.size)
+    {
+        result[k] = right[j];
+        j++;
+        k++;
+    }
+    
+    return result;
+}

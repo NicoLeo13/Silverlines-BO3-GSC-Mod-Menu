@@ -12,6 +12,10 @@ RunMenu()
 
     player = self SelectPlayer();
     menu = CleanMenuName(self getCurrentMenu());
+
+    weapons = ["Assault Rifles", "Sub Machine Guns", "Light Machine Guns", "Sniper Rifles", "Shotguns", "Pistols", "Launchers", "Specials"];
+    weaponsVar = ["assault", "smg", "lmg", "sniper", "cqb", "pistol", "launcher", "special"];
+    weaponAttachTypes = ["Optic", "Rig", "Mod"]; //gamedata\weapons\common\attachmenttable.csv
     
     switch(menu)
     {
@@ -20,11 +24,11 @@ RunMenu()
                 if(self getVerification() > 0)  //  Verified
                 {
                     self addOpt("Basic Scripts", ::newMenu, "Basic Scripts " + player GetEntityNumber());
-                    self addOpt("Menu Customization", ::newMenu, "Menu Customization");
                 }
                 if(self getVerification() > 1)  //  VIP
                 {
                     self addOpt("Gameplay", ::newMenu, "Gameplay " + player GetEntityNumber());
+                    self addOpt("Powerup Menu", ::newMenu, "Powerup Menu " + player GetEntityNumber());
                     self addOpt("Weapons", ::newMenu, "Weapons " + player GetEntityNumber());
                     self addOpt("Fun Scripts", ::newMenu, "Fun Scripts " + player GetEntityNumber());
                 }
@@ -42,6 +46,7 @@ RunMenu()
                     self addOpt("Bot Menu", ::newMenu, "Bot Menu");
                     self addOpt("Host Menu", ::newMenu, "Host Menu");
                 }
+                self addOpt("Menu Customization", ::newMenu, "Menu Customization");
             break;
         
         case "Basic Scripts":
@@ -141,6 +146,31 @@ RunMenu()
                 }
         break;
 
+        case "Powerup Menu":
+            self addMenu("Powerup Menu " + player GetEntityNumber(), "Powerups");
+                    self addOpt("Spawn Powerup", ::newMenu, "Spawn Powerup");
+            break;
+
+        case "Spawn Powerup":
+            if(!isDefined(self.PowerUpSpawnLocation))
+                self.PowerUpSpawnLocation = "Crosshairs";
+            powerups = GetArrayKeys(level.zombie_include_powerups);
+
+            self addMenu("Spawn Powerup", "Spawn Powerup");
+                // self addOptSlider("Powerup", ::SpawnPowerUp, powerups, 0);
+                
+                if(isDefined(powerups) && powerups.size)
+                {
+                    for(a = 0; a < powerups.size; a++)
+                    {
+                        if(powerups[a] != "free_perk")
+                            self addOpt(CleanString(powerups[a]), ::SpawnPowerUp, powerups[a]);
+                        else
+                            self addOpt("Free Perk", ::SpawnPowerUp, powerups[a]);
+                    }
+                }
+            break;
+
         case "Menu Customization":
             self addMenu("Menu Customization", "Menu Customization");
                 self addOpt("Set Default Preset", ::SetDefaultPreset);
@@ -197,7 +227,10 @@ RunMenu()
 
         case "Weapons":
             self addMenu("Weapons " + player GetEntityNumber(), "Weapons");
-            
+                self addOpt("Weapon Options", ::newMenu, "Weapon Options " + player GetEntityNumber());
+                self addOpt("Equipment", ::newMenu, "Equipment " + player GetEntityNumber());
+                for(i = 0; i < weapons.size; i++)
+                    self addOpt(weapons[i], ::newMenu, weapons[i]);
             break;
 
         case "Fun Scripts":
@@ -220,6 +253,7 @@ RunMenu()
                 {
                     self addOpt("Dvars", ::newMenu, "Dvars");
                     self addOpt("Change Map", ::newMenu, "Change Map");
+                    self addOpt("Music Menu", ::newMenu, "Music Menu");
                 }
             break;
 
@@ -234,16 +268,35 @@ RunMenu()
                     self addOptBool((level.script == level.mapNames[a]), ReturnMapName(level.mapNames[a]), ::ServerChangeMap, level.mapNames[a]);
             break;
         
+        case "Music Menu":
+            self addMenu("Music Menu", "Music Menu");
+                if(isDefined(level.musicNames))
+                    foreach(key, value in level.musicNames)
+                        self addOpt(value, ::PlayLobbyMusic, key);
+            break;
+        
         case "Bot Menu":
             self addMenu("Bot Menu", "Bot Menu");
-                self addOptIntSlider("Add Bots", ::AddBots, 1, 1, 3, 1);
-                self addOptBool(level.bot_revive, "Bot Revive Players", ::BotRevivePlayers);
-                self addOpt("Bot Config Test", ::CustomBotConfig);
                 self addOpt("Remove Bots", ::RemoveBots);
+                self addOptIntSlider("Add Bots", ::AddBots, 1, 1, 3, 1);
+                self addOpt("Revive Bots", ::ReviveBots);
+                self addOpt( "Give All Bots Random Weapon", ::BotGiveWeapon);
+                self addOpt( "PAP All Bots Weapons", ::PapBotWeapons);
+                self addOptSlider("Set Bot AAT", ::GiveBotsWeaponAAT, ArrayToString(level.aatNames), 0);
+                self addOptBool(level.BotAmmo, "Bot Unlimited Ammo", ::BotUnlimitedAmmo);
+                self addOptBool(level.BotRevive, "Bot Revive Players", ::BotRevivePlayers);
+                self addOptBool(level.BotAllPerks, "Enable Bot All Perks", ::BotsAllPerks);
+                self addOptBool(level.BotGodmode, "Enable Bot Godmode", ::BotGodmode);
+                self addOptBool(level.BotFollowHost, "Bot Follow Host", ::BotFollowHost);
+                self addOptBool(level.BotHunt, "Bot Hunting", ::BotHunting);
+                self addOptBool(level.BotDistributePoints, "Distribute Bot Points", ::BotDistributePoints);
+                self addOptBool(level.BotConfigTest, "Bot Config Test", ::CustomBotConfig);
+                // self addOpt("Bot Config Test", ::CustomBotConfig);
             break;
 
         case "Host Menu":
             self addMenu("Host Menu", "Host Menu");
+                self addOptBool((GetDvarInt("migration_forceHost") == 1), "Force Host", ::ForceHost);
                 self addOpt("Debug Exit", ::debugexit);
                 self addOpt("Restart Game", ::RestartGame);
                 self addOpt("Nuke Game (End)", ::DoNuke);
@@ -342,6 +395,95 @@ RunMenu()
                 }
             }
 
+            //Weapon Options
+            if(isSubStr(newmenu, "Weapon Options "))
+            {
+                nothingToShow = false;
+                self addMenu(newmenu, "Weapon Options");
+                    self addOpt("PaP/Un-PaP Current Weapon", ::PackCurrentWeapon, player);
+                    self addOpt("Set Random Camo", ::SetPlayerCamo, array::random(level.camosCustom), player);
+                    self addOptSlider("Set AAT", ::GiveWeaponAAT, ArrayToString(level.aatNames), 0, player);
+                    self addOptSlider("Set Camo", ::SetPlayerCamo, ArrayToString(level.camosCustom), 0, player);
+            }
+            
+            //Equipment
+            if(isSubStr(newmenu, "Equipment "))
+            {
+                nothingToShow = false;
+                self addMenu(newmenu, "Equipment");
+                
+                equipment = [];
+                
+                if(isDefined(level.zombie_lethal_grenade_list) && isDefined(level.zombie_tactical_grenade_list))
+                    equipment = ArrayCombine(level.zombie_lethal_grenade_list, level.zombie_tactical_grenade_list, 0, 1);
+                
+                // Add included equipment
+                if(isDefined(level.zombie_include_equipment))
+                    equipment = ArrayCombine(equipment, GetArrayKeys(level.zombie_include_equipment), 0, 1);
+
+                if(equipment.size > 0)
+                {
+                    foreach(weapon in equipment)
+                    {
+                        // Skip upgraded variants
+                        if(IsSubStr(weapon.name, "_upgraded"))
+                            continue;
+                            
+                        self addOptBool( player HasWeapon(weapon), weapon.displayname, ::GivePlayerEquipment, weapon, player);
+                    }
+                }
+                else
+                    self addOpt("No Equipment Found");
+            }
+            
+            //Weapons
+            if(IsInArray(weapons, newmenu))
+            {
+                pistols = ["pistol_standard", "pistol_burst", "pistol_fullauto", "pistol_m1911", "pistol_revolver38", "pistol_c96"];
+                specials = [];
+
+                foreach(index, weapon_type in weapons)
+                {
+                    if(newmenu == weapon_type)
+                    {
+                        nothingToShow = false;
+                        self addMenu(newmenu, weapon_type);
+                            foreach(weapon in GetArrayKeys(level.zombie_weapons))
+                            {
+                                if(MakeLocalizedString(weapon.displayname) == "" || weapon.isgrenadeweapon || weapon.name == "knife" || IsSubStr(weapon.name, "upgraded") || weapon.name == "none")
+                                    continue;
+                                if(!IsInArray(pistols, weapon.name) && !IsInArray(specials, weapon) && zm_utility::GetWeaponClassZM(weapon) == "weapon_pistol")
+                                    specials[specials.size] = weapon;
+                                else if(zm_utility::GetWeaponClassZM(weapon) == "weapon_" + weaponsVar[index])
+                                        self addOptBool(player hasWeapon2(weapon), weapon.displayname, ::givePlayerWeapon, weapon, player);
+                            }
+                    }
+                }
+
+                foreach(weapon in specials)
+                {
+                    if(newmenu == "Specials")
+                    {
+                        nothingToShow = false;
+                        if(weapon.isgrenadeweapon || weapon.name == "knife" || weapon.name == "none")
+                            continue;
+                        
+                        string = weapon.name;
+
+                        if(MakeLocalizedString(weapon.displayname) != "")
+                            string = weapon.displayname;
+                        
+                        self addOptBool(player hasWeapon2(weapon), string, ::givePlayerWeapon, weapon, player);
+                    }
+                }
+
+                if(newmenu == "Specials")
+                {
+                    self addOptBool(player hasWeapon2(GetWeapon("minigun")), "Death Machine", ::GivePlayerWeapon, GetWeapon("minigun"), player);
+                    self addOptBool(player hasWeapon2(GetWeapon("defaultweapon")), "Default Weapon", ::GivePlayerWeapon, GetWeapon("defaultweapon"), player);
+                }
+            }
+
             if(nothingToShow)
             {
                 self addMenu(newmenu, "No Options Found");
@@ -354,7 +496,7 @@ RunMenu()
 RunPlayerMenu(player, menu)
 {
     self.selected_player = player;  //  To be used in RunMenu
-    playerMenus = ["Basic Scripts", "Gameplay", "Fun Scripts"];
+    playerMenus = ["Basic Scripts", "Gameplay", "Fun Scripts", "Weapons"];
 
     self addMenu(menu, CleanName(player getName()));
         if(self getVerification() >= 3)

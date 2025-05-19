@@ -37,10 +37,10 @@
 #include scripts\shared\audio_shared;
 #include scripts\shared\fx_shared;
 
-#include scripts\shared\_burnplayer;
+// #include scripts\shared\_burnplayer;
 
 #include scripts\zm\gametypes\_globallogic;
-#include scripts\zm\_fx;
+// #include scripts\zm\_fx;
 #include scripts\zm\_util;
 #include scripts\zm\_zm;
 #include scripts\zm\_zm_behavior;
@@ -66,7 +66,7 @@
 // #include scripts\zm\_zm_weap_thundergun;
 #include scripts\shared\music_shared;
 
-#include scripts\zm\aats\_zm_aat_blast_furnace;
+// #include scripts\zm\aats\_zm_aat_blast_furnace;
 // #include scripts\zm\_zm_pers_upgrades;
 // #include scripts\zm\_zm_pers_upgrades_functions;
 // #include scripts\zm\_zm_pers_upgrades_system;
@@ -94,12 +94,32 @@ init()
 	// level.super_ee_weapon = getweapon("ray_gun");
     
     level.menuName = "Silverlines";
-    level.menuVersion = " Beta 0.7";
+    level.menuVersion = " Beta 1.1";
 
     level.menuStatus = ["None", "Verified", "VIP", "Admin", "Co-Host", "Host"];
 
     level.hud_names = ["Shader Left", "Shader Right", "Header Left", "Header Right", "Scrollbar", "Top Bar", "Bottom Bar"];
     level.huds = ["LUI_Shad", "LUI_Shad2", "LUI_Head", "LUI_Head2", "Scrollbar", "TopBar", "BottomBar"];
+
+    //Music
+    for(i = 0; i < 99; i++)
+        level.musicNames[tableLookup("gamedata/tables/common/music_player.csv", 0, i, 1)] = tableLookup("gamedata/tables/common/music_player.csv", 0, i, 2);
+
+    level.musicNames = mergeSortByValue(level.musicNames);
+    
+    //Camos
+    level.camosCustom = [15, 16, 17, 64, 66, 68, 75, 76, 77, 78, 79, 81, 83, 84, 85, 86, 87, 88, 89, 119, 120, 121, 122, 123, 124, 125, 126, 133, 134, 135, 136, 137, 138, level.pack_a_punch_camo_index];
+
+    //AATs
+    level.aatNames = [];
+    aatKeys = GetArrayKeys(level.aat);
+    for(i = 0; i < aatKeys.size; i++)
+    {
+        aat = level.aat[aatKeys[i]];
+        if(!isdefined(aat) || !isdefined(aat.name))
+            continue;
+        array::push(level.aatNames, CleanString(aat.name));
+    }
 
     level thread LoadMenuShaders();
     level thread LoadMenuColorsnFades();
@@ -184,7 +204,7 @@ DeathMonitor()
             self DeleteInstructions();
             // self.menu["Instructions"] = true;   //  Because it gets reset when hud deleted
 
-        self iPrintLnBold("^3Exit");
+        // self iPrintLnBold("^3Exit");
         self notify("MonitorEnd");
     }
 }
@@ -279,7 +299,7 @@ LoadCustomArrays()
     
     level.MenuCharacterNames = ["Dempsey", "Nikolai", "Richtofen", "Takeo", "Shadows of Evil Beast", "Floyd Campbell", "Jack Vincent", "Jessica Rose", "Nero Blackstone"];
     
-    level.CustomSpawnPoints = ArrayCombine(struct::get_array("player_respawn_point_arena", "targetname"), struct::get_array("player_respawn_point", "targetname"), 0, 1);
+    level.MapSpawnPoints = ArrayCombine(struct::get_array("player_respawn_point_arena", "targetname"), struct::get_array("player_respawn_point", "targetname"), 0, 1);
     
     level.MenuEffects = [];
     effects = GetArrayKeys(level._effect);
@@ -309,8 +329,8 @@ LoadCustomArrays()
 
     for(a = 0; a < bgb.size; a++)
         array::add(level.CustomBGB, bgb[a], 0);
-    level array::alphabetize(level.CustomBGB);
-    
+    // level array::alphabetize(level.CustomBGB);
+    level.CustomBGB = mergeSortByValue(level.CustomBGB);
 
     level.PhdFlopperGrenade = getweapon("frag_grenade_slaughter_slide");
 }

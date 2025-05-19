@@ -159,6 +159,15 @@ addOptSlider(name, fnc, values, start, arg1, arg2, arg3, arg4, arg5)
     menu = self.temp["memory"];
     size = self.menu["items"][menu].name.size;
     
+    // if(IsArray(values))
+    // {
+    //     self.menu_Strings[menu][size] = ArrayStrClean(values);
+    //     if(!IsArray(self.menu_Strings[menu]))
+    //         self.menu_Strings[menu] = array(values);
+    //     // self.menu_Strings[menu] = ArrayStrClean(self.menu_Strings[menu]);
+    // }
+    // else
+    //     self.menu_Strings[menu][size] = StrTok(values, ";");
     self.menu_Strings[menu][size] = StrTok(values, ";");
 
     self.menu["items"][menu].name[size] = MakeLocalizedString(name);

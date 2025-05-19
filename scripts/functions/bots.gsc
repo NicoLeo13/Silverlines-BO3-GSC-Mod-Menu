@@ -1,14 +1,16 @@
+//toDo: Enhance the bot system, pathfinding, and add more features
+
 // BOTS
 BotRevivePlayers()
 {
-	level.bot_revive = isDefined(level.bot_revive) ? undefined : true;
+	level.BotRevive = isDefined(level.BotRevive) ? undefined : true;
 
-    if(isDefined(level.bot_revive))
+    if(isDefined(level.BotRevive))
         self iPrintLnBold("Bot Revive Players ^2ON");
     else
         self iPrintLnBold("Bot Revive Players ^1OFF");
 
-    while(isDefined(level.bot_revive))
+    while(isDefined(level.BotRevive))
     {
         foreach(bot in level.players)
         {
@@ -75,6 +77,8 @@ RemoveBots()
 
 CustomBotConfig()
 {
+    level.botConfigTest = isDefined(level.botConfigTest) ? undefined : true;
+
     self NewBotSettings();
 
     setdvar("bot_AllowMelee", (isdefined(level.botsettings.allowmelee) ? level.botsettings.allowmelee : 0));
@@ -110,7 +114,7 @@ CustomBotConfig()
 	level.botsettings.swimtime = getdvarfloat("player_swimTime", 5) * 1000;
 
 
-	while(1)
+	while(level.botConfigTest)
 	{
 		foreach(player in level.player)
 		{
@@ -209,4 +213,383 @@ NewBotSettings()
         level.botsettings.aimerrormaxpitch = 0;
         level.botsettings.aimerrorminyaw = 0;
         level.botsettings.aimerrormaxyaw = 0;
+}
+
+MoveBotToPos(bot, self, distance = 100) 
+{
+    posb = bot.origin;
+    posp = self.origin;
+
+    if(!isDefined(bot)) 
+        return;
+    if(bot CanPath(posb, posp))
+    {
+        bot BotSetGoal(posp, distance);
+        // self iPrintLnBold(bot.name + " is pathing to you...");
+    }
+    else
+    {
+        self iPrintLnBold("Bot Could Not find Path");
+    }
+}
+
+BotFollowHost()
+{
+    level.BotFollowHost = isDefined(level.BotFollowHost) ? undefined : true;
+
+        while(isDefined(level.BotFollowHost))
+        {
+            foreach( bot in level.players )
+                {
+                    if(!bot IsTestClient())
+                        continue;
+                    MoveBotToPos(bot, self);
+                }
+            wait 1;
+        }
+}
+
+BotHunting()
+{
+    level.BotHunt = isDefined(level.BotHunt) ? undefined : true;
+
+	while(isDefined(level.BotHunt))
+	{
+		foreach( bot in level.players )
+			{
+				if(!bot IsTestClient())
+					continue;
+				// if(!bot.move_called)
+				MoveBotToRandom(bot);
+			}
+		wait randomIntRange(10, 15);
+	}
+}
+
+MoveBotToRandom(bot, distance = 5) 
+{
+    //PERKS
+    perks = GetEntArray("zombie_vending", "targetname");
+    if(!isdefined(perk_ent))
+    {
+        perk_ent = [];
+    }
+    else if(!isarray(perk_ent))
+    {
+        perk_ent = array(perk_ent);
+    }
+    foreach(perk in perks)
+    {
+        ent = perk.machine;
+        perk_ent[perk_ent.size] = ent;
+    }
+    //BGB MACHINE
+
+    // if(perk_ent.size > 0)
+    // {
+    //     self iPrintLnBold("defined");
+    //     foreach(i in perk_ent)
+    //     {
+    //         self iPrintLnBold(i.origin);
+    //         self SetOrigin(i.origin + (AnglesToRight(i.angles) * 70));
+    //         // self SetPlayerAngles(i.angles);
+    //         wait 10;
+    //     }
+    // }
+    
+    bot_paths = ArrayCombine(level.MapSpawnPoints, perk_ent, 0, 1);
+
+    posb = bot.origin;
+    posp = array::random(bot_paths);
+
+    if(!isDefined(bot)) 
+        return;
+    
+    if(bot CanPath(posb, (posp.origin + (AnglesToRight(posp.angles) * 50))))
+    {
+        self iPrintLnBold("^5" + CleanName(bot getName()) + " ^7Pathing...");
+        bot BotSetGoal(posp.origin + (AnglesToRight(posp.angles) * 50));
+        // self iPrintLnBold(bot.name + " is pathing to you...");
+    }
+    else
+    {
+        self iPrintLnBold("^5" + CleanName(bot getName()) + " ^1 Could Not find Path");
+        while(!bot CanPath(posb, (posp.origin + (AnglesToRight(posp.angles) * 50))))
+        {
+            posb = bot.origin;
+            posp = array::random(bot_paths);
+            wait .02;
+        }
+
+        if(bot CanPath(posb, (posp.origin + (AnglesToRight(posp.angles) * 50))))
+        {
+            self iPrintLnBold("^5" + CleanName(bot getName()) + " ^7New Path Set!");
+            bot BotSetGoal(posp.origin + (AnglesToRight(posp.angles) * 50));
+            // self iPrintLnBold(bot.name + " is pathing to you...");
+        }
+    }
+}
+
+BotsAllPerks()
+{
+    level.BotAllPerks = isDefined(level.BotAllPerks) ? undefined : true;
+
+    if(isDefined(level.BotAllPerks))
+    {
+        foreach( bot in level.players )
+        {
+            if(!bot IsTestClient())
+                continue;
+
+            GiveAllPerks(bot);
+            Keep_Perks(bot);
+        }
+        
+        self iPrintLnBold("Bots All Perks ^2ON");
+    }
+    else
+    {
+        foreach( bot in level.players )
+        {
+            if(!bot IsTestClient())
+                continue;
+
+            GiveAllPerks(bot);
+            Keep_Perks(bot);
+        }
+        self iPrintLnBold("Bots All Perks ^1OFF");
+    }
+}
+
+BotGodmode()
+{
+    level.BotGodmode = isDefined(level.BotGodmode) ? undefined : true;
+
+    if(isDefined(level.BotGodmode))
+    {
+        foreach( bot in level.players )
+			if(!bot IsTestClient())
+                continue;
+        
+            bot EnableInvulnerability();
+            
+        self iPrintLnBold("^2Enabled^7 Bot Godmode");
+    }
+    else
+    {
+        foreach( bot in level.players )
+            if(!bot IsTestClient())
+                continue;
+        
+            bot DisableInvulnerability();
+            
+        self iPrintLnBold("^1Disabled^7 Bot Godmode");
+    }   
+     
+}
+
+BotDistributePoints()
+{
+    level.BotDistributePoints = isDefined(level.BotDistributePoints) ? undefined : true;
+    
+    if(isDefined(level.BotDistributePoints))
+    {
+        self iPrintLnBold("Bot Score Distribution ^2ON");
+        botsize = [];
+        foreach(player in level.players)
+            {
+                if(player IsTestClient())
+                {
+                    botsize[botsize.size] = player;
+                }
+            }
+        // self iPrintLnBold(botsize.size);
+        // self iPrintLnBold(self.score);
+        while(isDefined(level.BotDistributePoints))
+        {
+            foreach(bot in level.players)
+            {
+                if(bot IsTestClient())
+                {
+                    if(bot.score >= 7000)
+                    {
+                        foreach(player in level.players)
+                        {
+                            if(!player IsTestClient())
+                            {
+                                player zm_score::add_to_player_score(bot.score / (level.players.size - botsize.size));
+                            }
+                            bot zm_score::minus_to_player_score((bot.score - 500));
+                        }
+                    }
+                }
+            }
+            wait 3;    
+        }    
+    }
+    else
+    {
+        self iPrintLnBold("Bot Score Distribution ^1OFF");
+    }
+}
+
+BotGiveWeapon()
+{
+    foreach( bot in level.players )
+    {
+        if(!bot IsTestClient())
+            continue;
+
+        GivePlayerRandomWeapon(bot);
+    }
+}
+
+GivePlayerRandomWeapon(player)
+{
+        // iPrintLnBold("^1" + level.zombie_weapons.size);
+
+        weaponsList_array = getArrayKeys(level.zombie_weapons);
+
+        weapsize3 = weaponsList_array.size;
+        weapsize3 = randomInt(weapsize3);
+        weapname = weaponsList_array[weapsize3].name;
+
+        if(IsSubStr(weapname, "knife") || IsSubStr(weapname, "frag_grenade") || IsSubStr(weapname, "cymbal_monkey") || IsSubStr(weapname, "hero_annihilator") || IsSubStr(weapname, "hero") || IsSubStr(weapname, "bouncingbetty"))
+        {
+            while(true)
+            {
+                weapsize3 = randomInt(weapsize3);
+                weapname = weaponsList_array[weapsize3].name;
+
+                if(!IsSubStr(weapname, "knife") || !IsSubStr(weapname, "frag_grenade") || !IsSubStr(weapname, "cymbal_monkey") || !IsSubStr(weapname, "hero") || !IsSubStr(weapname, "bouncingbetty"))
+                {
+                    // iPrintLnBold("new weapon rand = ^5" + weapname);
+                    break;
+                }
+                wait .02;
+            }
+        }
+
+        player TakeWeapon(player GetCurrentWeapon());
+        weapon = GetWeapon(weapname);
+        player GiveWeapon(weapon);
+        player GiveMaxAmmo(weapon);
+        player SwitchToWeapon(weapon);
+
+        // ToLower(CleanString(zm_utility::GetWeaponClassZM(weapon)));
+            self iPrintLnBold(MakeLocalizedString(weapon.displayname) + " ^7Given to: ^3" + CleanName(player getName()));
+}
+
+PapBotWeapons()
+{
+    //CAMO
+    camo = [15, 16, 17, 64, 66, 68, 75, 76, 77, 78, 79, 81, 83, 84, 85, 86, 87, 88, 89, 119, 120, 121, 122, 123, 124, 125, 126, 133, 134, 135, 136, 137, 138, level.pack_a_punch_camo_index];
+    if(!IsArray(camo))
+        camo = array(camo);
+
+    //AAT
+    keys = GetArrayKeys(level.aat);
+    if(!IsArray(keys))
+        keys = array(keys);
+
+    foreach(bot in level.players)
+    {
+        if(!bot IsTestClient())
+            continue;
+        
+        if(!bot zm_weapons::is_weapon_upgraded(bot GetCurrentWeapon()))
+        {
+            PackCurrentWeapon(bot);
+            wait .2;
+            weapon = bot GetCurrentWeapon();
+            
+            aat = array::random(keys);
+            randcamo = array::random(camo);
+            
+            GiveWeaponAAT(aat, bot);
+            SetPlayerCamo(randcamo, bot);
+            
+            self iPrintLnBold(MakeLocalizedString(weapon.displayname) + " ^7Given to: ^3" + CleanName(bot getName()));
+        }
+        else
+        {
+            // camo = RandomIntRange(1, 138);
+            randcamo = array::random(camo);
+            SetPlayerCamo(randcamo, bot);
+
+            // aat = array::random(keys);
+            // GiveWeaponAAT(aat, bot);
+        }
+    }
+}
+
+GiveBotsWeaponAAT(aat)
+{
+    aatName = aat;
+    
+    if(!isSubStr(aat, "aat_") || !isSubStr(aat, "zm_"))
+    {
+        keys = GetArrayKeys(level.aat);
+
+        foreach(key, value in level.aatNames)
+        {
+            if(aat == value)
+            {
+                aat = keys[key];  //Uses the key to pass the real aat
+                break;
+            }
+        }
+    }
+
+    foreach(bot in level.players)
+    {
+        if(!bot IsTestClient())
+            continue;
+
+        if(bot.aat[bot aat::get_nonalternate_weapon(bot GetCurrentWeapon())] != aat)
+            bot aat::acquire(bot GetCurrentWeapon(), aat);
+        else
+        {
+            bot aat::remove(bot GetCurrentWeapon());
+            bot clientfield::set_to_player("aat_current", 0);
+        }
+    }
+
+    self iPrintLnBold(aatName + " given to all Bots");
+}
+
+BotUnlimitedAmmo()
+{
+    level.BotAmmo = isDefined(level.BotAmmo) ? undefined : true;
+
+    if(isDefined(level.BotAmmo))
+    {
+        self iPrintLnBold("Bot Unlimited Ammo ^2ON");
+        while(level.BotAmmo)
+        {
+            foreach(bot in level.players)
+            {
+                bot InfiniteAmmo("Reload", bot);
+            }
+        }
+    }
+    else
+    {
+        foreach(bot in level.players)
+        {
+            bot InfiniteAmmo("Disable", bot);
+        }
+        self iPrintLnBold("Bot Unlimited Ammo ^1OFF");
+    }
+}
+
+ReviveBots()
+{
+    foreach( bot in level.players )
+    {
+        if(!bot IsTestClient())
+            continue;
+
+        PlayerRevive(bot);
+    }    
 }

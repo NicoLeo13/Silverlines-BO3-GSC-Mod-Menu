@@ -255,12 +255,6 @@ DrawText()
     
     options = self.menu["items"][self getCurrentMenu()].name;
 
-    if(!isDefined(options) || !options.size)
-    {
-        self addOpt("No Options Found");
-        options = self.menu["items"][self getCurrentMenu()].name;
-    }
-
     if(!isDefined(self.menu["ScrollbarLastPos"][self getCurrentMenu()]))
     {
         if(isDefined(options) || options.size)
