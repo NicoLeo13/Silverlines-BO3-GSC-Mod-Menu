@@ -65,6 +65,7 @@
 #include scripts\zm\_zm_lightning_chain;
 // #include scripts\zm\_zm_weap_thundergun;
 #include scripts\shared\music_shared;
+#include scripts\zm\bgbs\_zm_bgb_reign_drops;
 
 // #include scripts\zm\aats\_zm_aat_blast_furnace;
 // #include scripts\zm\_zm_pers_upgrades;

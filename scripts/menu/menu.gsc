@@ -157,18 +157,19 @@ RunMenu()
             powerups = GetArrayKeys(level.zombie_include_powerups);
 
             self addMenu("Spawn Powerup", "Spawn Powerup");
-                // self addOptSlider("Powerup", ::SpawnPowerUp, powerups, 0);
-                
-                if(isDefined(powerups) && powerups.size)
-                {
-                    for(a = 0; a < powerups.size; a++)
-                    {
-                        if(powerups[a] != "free_perk")
-                            self addOpt(CleanString(powerups[a]), ::SpawnPowerUp, powerups[a]);
-                        else
-                            self addOpt("Free Perk", ::SpawnPowerUp, powerups[a]);
-                    }
-                }
+                self addOptSlider("Spawn Powerup", ::SpawnPowerUp, powerups, 0);
+                self addOpt("Spawn All", ::SpawnPowerUp, "Spawn All");
+
+                // if(isDefined(powerups) && powerups.size)
+                // {
+                //     for(a = 0; a < powerups.size; a++)
+                //     {
+                //         if(powerups[a] != "free_perk")
+                //             self addOpt(CleanString(powerups[a]), ::SpawnPowerUp, powerups[a]);
+                //         else
+                //             self addOpt("Free Perk", ::SpawnPowerUp, powerups[a]);
+                //     }
+                // }
             break;
 
         case "Menu Customization":
@@ -242,7 +243,14 @@ RunMenu()
         case "Fx Menu":
             self addMenu("Fx Menu", "Fx Menu");
                 self addOpt("Delete All FXs", ::CustomFxPlayer, undefined, true);
-                self addOpt("");
+                // self addOpt("");
+                self addOpt("Fx List", ::newMenu, "Fx List");
+                // for(a = 0; a < level.MenuEffects.size; a++)
+                //     self addOpt(level.MenuEffects[a].name, ::CustomFxPlayer, level.MenuEffects[a].name);
+            break;
+
+        case "Fx List":
+            self addMenu("Fx List", "Fx List");
                 for(a = 0; a < level.MenuEffects.size; a++)
                     self addOpt(level.MenuEffects[a].name, ::CustomFxPlayer, level.MenuEffects[a].name);
             break;
@@ -426,8 +434,8 @@ RunMenu()
                     foreach(weapon in equipment)
                     {
                         // Skip upgraded variants
-                        if(IsSubStr(weapon.name, "_upgraded"))
-                            continue;
+                        // if(IsSubStr(weapon.name, "_upgraded"))
+                            // continue;
                             
                         self addOptBool( player HasWeapon(weapon), weapon.displayname, ::GivePlayerEquipment, weapon, player);
                     }

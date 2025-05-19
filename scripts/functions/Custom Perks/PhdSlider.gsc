@@ -1,3 +1,5 @@
+//toDo: PROGRESS BAR ON BOTTOM RIGHT
+
 //PhD Flopper
 PhdFlopper(player, version)
 {
@@ -152,20 +154,43 @@ DoPhdFlopper()
 DoPhdFX()
 {
     if(isDefined(self.PhdFxOrigin))
-        self.PhdFxOrigin Delete();
+        self DeleteFxAfterTime(0);
 
     while(self IsSliding())
     {
         // self.PhdFx[self.PhdFx.size] = playfx(level._effect["teleport_aoe_kill"], self.origin + vectorscale((0, 0, 1), 30));
         // fx::play("zombie/fx_dog_fire_trail_zmb", self.origin, (0, 0, 0), 2);
-        fx::play("character_fire_death_torso", self.origin, (0, 0, 1), 2, 0, "j_head");
-        wait 0.02;
+        
+        // fx::play("character_fire_death_torso", self.origin, (0, 0, 1), 2, 0, "j_head");
+        fx = "character_fire_death_torso";
+        self.PhdFxOrigin = util::spawn_model("tag_origin", self.origin);
+	    self.PhdFxSpawned[self.PhdFxSpawned.size] = PlayFXOnTag(level._effect[fx], self.PhdFxOrigin, "tag_origin");
+        wait 0.05;
     }
     if(!isDefined(self.PhdCooldown) && self.PhdFlopper == "Flopper")
     {
         PlaySoundAtPosition("zmb_bgb_powerup_burnedout", self.origin + vectorscale((0, 0, 1), 30));
         // self thread clientfield::increment_to_player(("zm_bgb_burned_out" + "_1p") + "toplayer");
         // self thread clientfield::increment(("zm_bgb_burned_out" + "_3p") + "_allplayers");
+    }
+
+    self thread DeleteFxAfterTime(5);
+}
+
+DeleteFxAfterTime(time = 5)
+{
+    wait time;
+    if(isDefined(self.PhdFxOrigin))
+    {
+        for(i = 0; i < self.PhdFxSpawned.size; i++)
+		{
+			// self iPrintLnBold(i);
+			self.PhdFxSpawned[i] delete();
+		}
+		self.PhdFxOrigin delete();
+		self.PhdFxOrigin = undefined;
+		self.PhdFxSpawned = [];
+		return;
     }
 }
 

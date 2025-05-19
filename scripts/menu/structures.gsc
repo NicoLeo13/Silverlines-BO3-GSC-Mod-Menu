@@ -159,16 +159,25 @@ addOptSlider(name, fnc, values, start, arg1, arg2, arg3, arg4, arg5)
     menu = self.temp["memory"];
     size = self.menu["items"][menu].name.size;
     
-    // if(IsArray(values))
-    // {
-    //     self.menu_Strings[menu][size] = ArrayStrClean(values);
-    //     if(!IsArray(self.menu_Strings[menu]))
-    //         self.menu_Strings[menu] = array(values);
-    //     // self.menu_Strings[menu] = ArrayStrClean(self.menu_Strings[menu]);
-    // }
-    // else
-    //     self.menu_Strings[menu][size] = StrTok(values, ";");
-    self.menu_Strings[menu][size] = StrTok(values, ";");
+    //Can pass a string or an array
+    //If passing a string, it will be split by ";"
+    if(IsArray(values))
+    {
+        self.menu_RealStrings[menu][size] = values;
+        self.menu_Strings[menu][size] = ArrayStrClean(values);
+
+        if(!IsArray(self.menu_Strings[menu]) || !IsArray(self.menu_RealStrings[menu]))
+        {
+            self.menu_RealStrings[menu] = array(values);
+            self.menu_Strings[menu] = array(ArrayStrClean(values));
+        }
+    }
+    else
+    {
+        self.menu_RealStrings[menu][size] = StrTok(values, ";");
+        self.menu_Strings[menu][size] = StrTok(values, ";");
+    }
+    // self.menu_Strings[menu][size] = StrTok(values, ";");
 
     self.menu["items"][menu].name[size] = MakeLocalizedString(name);
     self.menu["items"][menu].func[size] = fnc;

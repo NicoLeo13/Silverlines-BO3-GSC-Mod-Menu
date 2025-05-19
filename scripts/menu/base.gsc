@@ -101,7 +101,7 @@ MenuMonitor()
                 }
                 else if(isDefined(stringslider))
                 {
-                    self thread ExecFunc(menufunc, self.menu_Strings[menu][cursor][self.menu_SValue[menu][cursor]], menuarg.arg1[cursor], menuarg.arg2[cursor], menuarg.arg3[cursor], menuarg.arg4[cursor], menuarg.arg5[cursor]);
+                    self thread ExecFunc(menufunc, self.menu_RealStrings[menu][cursor][self.menu_SValue[menu][cursor]], menuarg.arg1[cursor], menuarg.arg2[cursor], menuarg.arg3[cursor], menuarg.arg4[cursor], menuarg.arg5[cursor]);
                     wait 0.05;
                     self DoClickAnim();
                     self RefreshMenu();
