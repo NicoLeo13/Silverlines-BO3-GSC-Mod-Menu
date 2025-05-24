@@ -121,16 +121,37 @@ ElectrifyZombie(version)
         if(a_zombies.size < 1)
             return;
             
-        self playsound("zmb_elec_jib_zombie");
+        // self playsound("zmb_elec_jib_zombie");
         foreach(zombie in a_zombies)
         {
             if(isalive(self) && isalive(zombie))
             {
+                zombie thread ElectricCherryDeathFX();
                 zombie lightning_chain::arc_damage_ent(self, 1, level._lightning_params);
                 self zm_score::add_to_player_score(40);
             }
         }
     }
+}
+
+ElectricCherryDeathFX()
+{
+    self endon("death");
+	self playsound("zmb_elec_jib_zombie");
+	if(!(isdefined(self.head_gibbed) && self.head_gibbed))
+	{
+		if(isvehicle(self))
+			self clientfield::set("tesla_shock_eyes_fx_veh", 1);
+		else
+			self clientfield::set("tesla_shock_eyes_fx", 1);
+	}
+	else
+	{
+		if(isvehicle(self))
+			self clientfield::set("tesla_death_fx_veh", 1);
+		else
+			self clientfield::set("tesla_death_fx", 1);
+	}
 }
 
 ElectricCherryFX()

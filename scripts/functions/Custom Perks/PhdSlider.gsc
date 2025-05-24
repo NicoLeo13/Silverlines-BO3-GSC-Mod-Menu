@@ -1,4 +1,12 @@
-//toDo: PROGRESS BAR ON BOTTOM RIGHT
+// toDo: PROGRESS BAR ON BOTTOM RIGHT
+// TODO: ADD SLIDE DISTANCE
+// TODO: Check actionslot for PhD Flopper
+
+// PhdActionSlot(n_value)
+// {
+// 	self setactionslot(1, "bgb");
+// 	self clientfield::set_player_uimodel("bgb_activations_remaining", n_value);
+// }
 
 //PhD Flopper
 PhdFlopper(player, version)
@@ -139,6 +147,7 @@ DoPhdFlopper()
                 // if(self.PhdFlopper == "Slider")
                 if(self.PhdFlopper == "Slider" && isDefined(self.PhdCooldown))  //  Slider Cooldown
                 {
+                    // Add progress bar logic here (maybe)
                     self.PhdSliderPower += 1.3;
                     if(self.PhdSliderPower > 100)
                         self.PhdSliderPower = 100;
@@ -366,3 +375,13 @@ RemovePhdFlopper()
 // self setmovespeedscale(1);
 // self setsprintduration(4);
 // self setsprintcooldown(0);
+
+// PhD Slider Bar
+// PhdSliderBar()
+// {
+//     if(!isdefined(self.phdSliderBar))
+// 	{
+// 		self.phdSliderBar = self hud::createprimaryprogressbar();
+//         self.phdSliderBar hud::updatebar(0.01, 1 / revivetime);
+// 	}
+// }

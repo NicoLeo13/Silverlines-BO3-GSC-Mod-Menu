@@ -122,6 +122,11 @@ init()
         array::push(level.aatNames, CleanString(aat.name));
     }
 
+    // Mystery Box CustomWeights
+
+    if(isDefined(level.CustomRandomWeaponWeights))
+        level.mysteryBoxOriginalWeights = level.CustomRandomWeaponWeights;
+
     level thread LoadMenuShaders();
     level thread LoadMenuColorsnFades();
 
@@ -216,7 +221,10 @@ playerSetup()
     self thread defineVariables();
 
     if(self getName() == "X Y Constant")
+    {
         self.devMode = true;
+        self.customMaxisDrone = true;
+    }
     
     if(self isHost())
     {

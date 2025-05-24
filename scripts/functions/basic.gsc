@@ -184,7 +184,7 @@ GiveGobblegum(gum, player)
         {
             player takeWeapon(weapon);
             player zm_weapons::switch_back_primary_weapon(saved);
-            bgb::give(gum);
+            player bgb::give(gum);
         }
     }
     else

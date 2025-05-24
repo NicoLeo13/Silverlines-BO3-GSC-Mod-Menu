@@ -13,8 +13,8 @@ RunMenu()
     player = self SelectPlayer();
     menu = CleanMenuName(self getCurrentMenu());
 
-    weapons = ["Assault Rifles", "Sub Machine Guns", "Light Machine Guns", "Sniper Rifles", "Shotguns", "Pistols", "Launchers", "Specials"];
-    weaponsVar = ["assault", "smg", "lmg", "sniper", "cqb", "pistol", "launcher", "special"];
+    weapons = ["Assault Rifles", "Sub Machine Guns", "Light Machine Guns", "Sniper Rifles", "Shotguns", "Pistols", "Launchers", "Specials", "Knifes"];
+    weaponsVar = ["assault", "smg", "lmg", "sniper", "cqb", "pistol", "launcher", "special", "knife"];
     weaponAttachTypes = ["Optic", "Rig", "Mod"]; //gamedata\weapons\common\attachmenttable.csv
     
     switch(menu)
@@ -259,6 +259,7 @@ RunMenu()
             self addMenu("Server Options", "Server Options");
                 if(self IsHost())
                 {
+                    self addOptBool(level.mysteryBoxPap, "PaP Mystery Box Weapons", ::MysteryBoxPap);
                     self addOpt("Dvars", ::newMenu, "Dvars");
                     self addOpt("Change Map", ::newMenu, "Change Map");
                     self addOpt("Music Menu", ::newMenu, "Music Menu");
@@ -363,7 +364,7 @@ RunMenu()
                     self addOptBool(self.RainbowActive[level.huds[i]], "Rainbow Fade", ::RainbowEffect, self.menu[HUD][level.huds[i]], self.fadeDelay[level.huds[i]], level.huds[i]);
                     self addOptBool(self.DarkRainbowActive[level.huds[i]], "Dark Rainbow Fade", ::DarkRainbowEffect, self.menu[HUD][level.huds[i]], self.fadeDelay[level.huds[i]], level.huds[i]);
                     self addOptBool(self.LightRainbowActive[level.huds[i]], "Light Rainbow Fade", ::LightRainbowEffect, self.menu[HUD][level.huds[i]], self.fadeDelay[level.huds[i]], level.huds[i]);
-                    self addOptSlider("Random Rainbow", ::DoRandomRainbow, "Normal;Light;Dark", undefined, self.menu[HUD][level.huds[i]], self.fadeDelay[level.huds[i]], level.huds[i]);
+                    self addOptSlider("Random Color Fade", ::DoRandomRainbow, "Normal;Light;Dark", undefined, self.menu[HUD][level.huds[i]], self.fadeDelay[level.huds[i]], level.huds[i]);
                     for(a = 0; a <= level.colorNames.size; a++)
                     {
                         self addOpt(level.colorNames[a], ::ChangeHUDColor, self.menu[HUD][level.huds[i]], level.colors[a], level.huds[i]);
@@ -429,6 +430,9 @@ RunMenu()
                 if(isDefined(level.zombie_include_equipment))
                     equipment = ArrayCombine(equipment, GetArrayKeys(level.zombie_include_equipment), 0, 1);
 
+                if(isDefined(level.placeable_mines))
+                    equipment = ArrayCombine(equipment, level.placeable_mines, 0, 1);
+
                 if(equipment.size > 0)
                 {
                     foreach(weapon in equipment)
@@ -436,8 +440,18 @@ RunMenu()
                         // Skip upgraded variants
                         // if(IsSubStr(weapon.name, "_upgraded"))
                             // continue;
-                            
-                        self addOptBool( player HasWeapon(weapon), weapon.displayname, ::GivePlayerEquipment, weapon, player);
+                        if(MakeLocalizedString(weapon.displayname) == "" || weapon.name == "none")
+                            continue;
+                        else if(weapon.name == "claymore")
+                            self addOptBool( player HasWeapon(weapon), "Claymore", ::GivePlayerEquipment, weapon, player);
+                        else if(isSubStr(weapon.name, "shield") && IsSubStr(weapon.name, "upgraded"))
+                            self addOptBool( player HasWeapon(weapon), MakeLocalizedString(weapon.displayname) + " Upgraded", ::GivePlayerEquipment, weapon, player);
+                        else if(isSubStr(weapon.name, "widow"))
+                            self addOptBool( player HasWeapon(weapon), "Widows Wine Grenade", ::GivePlayerEquipment, weapon, player);
+                        else if(isSubStr(weapon.name, "diesel"))
+                            self addOptBool( (player HasWeapon(weapon) || isdefined(player.hasMaxisQuadrotor)), weapon.displayname, ::GivePlayerEquipment, weapon, player);
+                        else
+                            self addOptBool( player HasWeapon(weapon), weapon.displayname, ::GivePlayerEquipment, weapon, player);
                     }
                 }
                 else
@@ -458,19 +472,25 @@ RunMenu()
                         self addMenu(newmenu, weapon_type);
                             foreach(weapon in GetArrayKeys(level.zombie_weapons))
                             {
-                                if(MakeLocalizedString(weapon.displayname) == "" || weapon.isgrenadeweapon || weapon.name == "knife" || IsSubStr(weapon.name, "upgraded") || weapon.name == "none")
+                                // if(MakeLocalizedString(weapon.displayname) == "" || weapon.isgrenadeweapon || weapon.name == "knife" || IsSubStr(weapon.name, "upgraded") || weapon.name == "none")
+                                if(MakeLocalizedString(weapon.displayname) == "" || weapon.isgrenadeweapon || (IsSubStr(weapon.name, "upgraded") && !IsSubStr(weapon.name, "staff")) || weapon.name == "none")
                                     continue;
+                                else if(weapon.isequipment || weapon.isriotshield || weapon.isgrenadeweapon || zm_utility::is_placeable_mine(weapon))
+                                    continue;
+                                
+                                // Pistols
                                 if(!IsInArray(pistols, weapon.name) && !IsInArray(specials, weapon) && zm_utility::GetWeaponClassZM(weapon) == "weapon_pistol")
                                     specials[specials.size] = weapon;
+                                // Every other weapon to their respective category
                                 else if(zm_utility::GetWeaponClassZM(weapon) == "weapon_" + weaponsVar[index])
                                         self addOptBool(player hasWeapon2(weapon), weapon.displayname, ::givePlayerWeapon, weapon, player);
                             }
                     }
                 }
 
-                foreach(weapon in specials)
+                if(newmenu == "Specials")
                 {
-                    if(newmenu == "Specials")
+                    foreach(weapon in specials)
                     {
                         nothingToShow = false;
                         if(weapon.isgrenadeweapon || weapon.name == "knife" || weapon.name == "none")
@@ -483,10 +503,7 @@ RunMenu()
                         
                         self addOptBool(player hasWeapon2(weapon), string, ::givePlayerWeapon, weapon, player);
                     }
-                }
-
-                if(newmenu == "Specials")
-                {
+                    
                     self addOptBool(player hasWeapon2(GetWeapon("minigun")), "Death Machine", ::GivePlayerWeapon, GetWeapon("minigun"), player);
                     self addOptBool(player hasWeapon2(GetWeapon("defaultweapon")), "Default Weapon", ::GivePlayerWeapon, GetWeapon("defaultweapon"), player);
                 }
