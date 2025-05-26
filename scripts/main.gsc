@@ -110,6 +110,7 @@ init()
     
     //Camos
     level.camosCustom = [15, 16, 17, 64, 66, 68, 75, 76, 77, 78, 79, 81, 83, 84, 85, 86, 87, 88, 89, 119, 120, 121, 122, 123, 124, 125, 126, 133, 134, 135, 136, 137, 138, level.pack_a_punch_camo_index];
+    level.mapDefaultCamoIndex = level.pack_a_punch_camo_index;
 
     //AATs
     level.aatNames = [];
@@ -123,7 +124,7 @@ init()
     }
 
     // Mystery Box CustomWeights
-
+    level.customWeaponsInBox = [];
     if(isDefined(level.CustomRandomWeaponWeights))
         level.mysteryBoxOriginalWeights = level.CustomRandomWeaponWeights;
 

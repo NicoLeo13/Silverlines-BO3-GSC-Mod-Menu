@@ -260,9 +260,10 @@ RunMenu()
                 if(self IsHost())
                 {
                     self addOptBool(level.mysteryBoxPap, "PaP Mystery Box Weapons", ::MysteryBoxPap);
+                    self addOptSlider("Set Level PaP Camo", ::SetLevelPapCamo, ArrayToString(level.camosCustom), 0);
+                    self addOpt("Music Menu", ::newMenu, "Music Menu");
                     self addOpt("Dvars", ::newMenu, "Dvars");
                     self addOpt("Change Map", ::newMenu, "Change Map");
-                    self addOpt("Music Menu", ::newMenu, "Music Menu");
                 }
             break;
 

@@ -484,9 +484,14 @@ ForceHost()
     }
 }
 
-ArrayToString(array)
+ArrayToString(array, additionalStrs = undefined)
 {
     str = "";
+
+    // Shoudl be passed as a string separated by ";, not an array
+    if(isDefined(additionalStrs))
+        str += additionalStrs;
+    self iPrintLnBold(str);
     
     for(a = 0; a < array.size; a++)
     {
@@ -495,7 +500,7 @@ ArrayToString(array)
         if(a != (array.size - 1))
             str += ";";
     }
-    
+    self iPrintLnBold(str);
     return str;
 }
 

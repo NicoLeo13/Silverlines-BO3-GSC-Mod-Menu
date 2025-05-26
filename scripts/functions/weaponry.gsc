@@ -1,6 +1,3 @@
-// TODO: Riot Shield Give/Take logic
-// TODO: Placeable Equipment Give/Take logic
-
 TakeCurrentWeapon(player)
 {
     weapon = player GetCurrentWeapon();
@@ -318,6 +315,18 @@ SetPlayerCamo(camo, player)
     player SwitchToWeaponImmediate(weap);
 }
 
+SetLevelPapCamo(camo)
+{
+    if(IsString(camo) && camo != "Default")
+    {
+        camo = StringToInt(camo);
+        level.pack_a_punch_camo_index = camo;
+    }
+    else
+        level.pack_a_punch_camo_index = level.mapDefaultCamoIndex;
+
+}
+
 GiveWeaponAAT(aat, player)
 {
     if(!isSubStr(aat, "aat_") || !isSubStr(aat, "zm_"))
@@ -343,33 +352,34 @@ GiveWeaponAAT(aat, player)
     }
 }
 
-// TODO: Fix this
 MysteryBoxPap()
 {
     level.mysteryBoxPap = isDefined(level.mysteryBoxPap) ? undefined : true;
 
-    if(level.mysteryBoxPap)
+    if(isdefined(level.mysteryBoxPap) && level.mysteryBoxPap) 
     {
-        keys = getarraykeys(level.zombie_weapons);
-        for(i = 0; i < keys.size; i++)
+        weapons = GetArrayKeys(level.zombie_weapons);
+        foreach(weapon in weapons)
         {
-            if(CanPutWeaponInBox(keys[i]))
+            if(isDefined(weapon) && isDefined(level.zombie_weapons[weapon].is_in_box) && level.zombie_weapons[weapon].is_in_box)
             {
-                // weapons[weapons.size] = zm_weapons::get_upgrade_weapon(keys[i], 1);
-                level.CustomRandomWeaponWeights[level.CustomRandomWeaponWeights.size] = zm_weapons::get_upgrade_weapon(keys[i], 1);
+                upgradedWeap = level.zombie_weapons[weapon].upgrade;         
+                level.customWeaponsInBox[level.customWeaponsInBox.size] = upgradedWeap;
             }
         }
-        
-        array::randomize(level.CustomRandomWeaponWeights);
-        // if(weapons.size > 0)
-        // {
-        //     level.CustomRandomWeaponWeights = [];
-        //     ArrayCombine(level.CustomRandomWeaponWeights, weapons, 0, 1);
-        //     // level.CustomRandomWeaponWeights = array::randomize(weapons);
-        // }
+        level.CustomRandomWeaponWeights = ::PutWeaponsInBox;
     }
     else
+    {
+        level.customWeaponsInBox = [];
         level.CustomRandomWeaponWeights = level.mysteryBoxOriginalWeights;
+    }
+    
+}
+
+PutWeaponsInBox()
+{
+    return array::randomize(level.customWeaponsInBox);
 }
 
 CanPutWeaponInBox(weapon)
