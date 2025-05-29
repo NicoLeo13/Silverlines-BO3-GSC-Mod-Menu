@@ -387,3 +387,13 @@ CanPutWeaponInBox(weapon)
 	if(!zm_weapons::get_is_in_box(weapon))
 		return 0;
 }
+
+SetMenuUpgradedWeapons(player)
+{
+    player.weaponsVariant = isDefined(player.weaponsVariant) ? undefined : true;
+
+    // if(isdefined(player.weaponsVariant) && player.weaponsVariant)
+    //     player.menuWeapons = ArrayCopy(level.zombie_weapons_upgraded);
+    // else
+    //     player.menuWeapons = ArrayCopy(level.zombie_weapons);
+}

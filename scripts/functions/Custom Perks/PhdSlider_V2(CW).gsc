@@ -10,7 +10,7 @@ DoPhdExplosionV2()
 	{
         if(!self IsOnGround())
         {
-            self iPrintLnBold("In Air");
+            // self iPrintLnBold("In Air");
 			dif = start[2] - self.origin[2];
             damage = damage + int(dif * 2);
             self.PhdAirborne = true;
@@ -30,7 +30,7 @@ DoPhdExplosionV2()
                 if(isalive(a_zombies[0]))
 				{
 					self iPrintLnBold("Enemy Close");
-					self iPrintLnBold(self.PhdSlideDist);
+					// self iPrintLnBold(self.PhdSlideDist);
 					self setvelocity((0, 0, 0));
 					self slide_explosion(self.PhdSlideDist, airborne, damage);
 					return;
@@ -50,7 +50,7 @@ slide_explosion(SlideDistance, jumpDone, baseDamage)
 	{
 		if(!self IsOnGround())
         {
-            self iPrintLnBold("In Air");
+            // self iPrintLnBold("In Air");
 			dif = start[2] - self.origin[2];
             baseDamage = baseDamage + int(dif * 2);
             jumpDone = true;
@@ -151,7 +151,7 @@ CwPhdExplosion(damage, explosion_radius, jumpDone)
 
 	a_zombies = getaiteamarray(level.zombie_team);
 	a_zombies = arraysortclosest(a_zombies, self GetOrigin(), a_zombies.size, 0, explosion_radius);
-	self iPrintLnBold("^6" + a_zombies.size);
+	// self iPrintLnBold("^6" + a_zombies.size);
 	if(a_zombies.size < 1 || !isDefined(a_zombies.size))
 	{
 		self.PhdExplosionPlaying = undefined;
@@ -196,7 +196,7 @@ CwPhdExplosion(damage, explosion_radius, jumpDone)
 	// self thread clientfield::increment_to_player(("zm_bgb_burned_out" + "_1p") + "toplayer");
 	if(jumpDone)
 	{
-		self iPrintLnBold("Jump Done");
+		// self iPrintLnBold("Jump Done");
 		a_zombies = getaiteamarray(level.zombie_team);
 		a_zombies = arraysortclosest(a_zombies, self GetOrigin(), a_zombies.size, 0, explosion_radius * 2);
 		foreach(zombie in a_zombies)

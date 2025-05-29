@@ -8,7 +8,7 @@ PlayerDeath(type, player)
     player DisableInvulnerability(); 
 
     if(!Is_Alive(player))
-        return self iPrintlnBold("^1ERROR: ^7Player Isn't Alive");
+        return self iPrintlnBold("^1Error: ^7Player Isn't Alive");
     
     wait 0.1;
     
@@ -19,7 +19,7 @@ PlayerDeath(type, player)
                 return self iPrintlnBold("^1Error: ^7You Can't Down The Host");
             
             if(player IsDown())
-                return self iPrintlnBold("^1ERROR: ^7Player Is Already Down");
+                return self iPrintlnBold("^1Error: ^7Player Is Already Down");
 
             if(player getVerification() >= self getVerification() && !self IsHost())
                 return self iPrintlnBold("^1Error: ^7Can't Down Players with = or Greater Access Level Than Yours");

@@ -229,6 +229,8 @@ RunMenu()
         case "Weapons":
             self addMenu("Weapons " + player GetEntityNumber(), "Weapons");
                 self addOpt("Weapon Options", ::newMenu, "Weapon Options " + player GetEntityNumber());
+                self addOptBool(player.weaponsVariant, "Set Upgraded Weapons", ::SetMenuUpgradedWeapons, player);
+                self addOpt("");
                 self addOpt("Equipment", ::newMenu, "Equipment " + player GetEntityNumber());
                 for(i = 0; i < weapons.size; i++)
                     self addOpt(weapons[i], ::newMenu, weapons[i]);
@@ -260,7 +262,7 @@ RunMenu()
                 if(self IsHost())
                 {
                     self addOptBool(level.mysteryBoxPap, "PaP Mystery Box Weapons", ::MysteryBoxPap);
-                    self addOptSlider("Set Level PaP Camo", ::SetLevelPapCamo, ArrayToString(level.camosCustom), 0);
+                    self addOptSlider("Set Level PaP Camo", ::SetLevelPapCamo, ArrayToString(level.camosCustom, "Default;"), 0);
                     self addOpt("Music Menu", ::newMenu, "Music Menu");
                     self addOpt("Dvars", ::newMenu, "Dvars");
                     self addOpt("Change Map", ::newMenu, "Change Map");
@@ -423,9 +425,13 @@ RunMenu()
                 self addMenu(newmenu, "Equipment");
                 
                 equipment = [];
+                equipmentNoDupes = [];
                 
                 if(isDefined(level.zombie_lethal_grenade_list) && isDefined(level.zombie_tactical_grenade_list))
-                    equipment = ArrayCombine(level.zombie_lethal_grenade_list, level.zombie_tactical_grenade_list, 0, 1);
+                {
+                    equipment = ArrayCombine(equipment, level.zombie_lethal_grenade_list, 0, 1);
+                    equipment = ArrayCombine(equipment, level.zombie_tactical_grenade_list, 0, 1);
+                }
                 
                 // Add included equipment
                 if(isDefined(level.zombie_include_equipment))
@@ -441,7 +447,10 @@ RunMenu()
                         // Skip upgraded variants
                         // if(IsSubStr(weapon.name, "_upgraded"))
                             // continue;
-                        if(MakeLocalizedString(weapon.displayname) == "" || weapon.name == "none")
+                        if(IsInArray(equipmentNoDupes, weapon))
+                            continue;
+
+                        if(weapon.displayname == "" || weapon.name == "none")
                             continue;
                         else if(weapon.name == "claymore")
                             self addOptBool( player HasWeapon(weapon), "Claymore", ::GivePlayerEquipment, weapon, player);
@@ -452,7 +461,14 @@ RunMenu()
                         else if(isSubStr(weapon.name, "diesel"))
                             self addOptBool( (player HasWeapon(weapon) || isdefined(player.hasMaxisQuadrotor)), weapon.displayname, ::GivePlayerEquipment, weapon, player);
                         else
-                            self addOptBool( player HasWeapon(weapon), weapon.displayname, ::GivePlayerEquipment, weapon, player);
+                        {
+                            if(IsSubStr(weapon.name, "upgraded"))
+                                self addOptBool( player HasWeapon(weapon), weapon.displayname + " Upgraded", ::GivePlayerEquipment, weapon, player);
+                            else
+                                self addOptBool( player HasWeapon(weapon), MakeLocalizedString(weapon.displayname), ::GivePlayerEquipment, weapon, player);
+                        }
+
+                        equipmentNoDupes[equipmentNoDupes.size] = weapon;
                     }
                 }
                 else
@@ -471,20 +487,41 @@ RunMenu()
                     {
                         nothingToShow = false;
                         self addMenu(newmenu, weapon_type);
-                            foreach(weapon in GetArrayKeys(level.zombie_weapons))
+                            foreach(weapon in GetArrayKeys(self.menuWeapons))
                             {
                                 // if(MakeLocalizedString(weapon.displayname) == "" || weapon.isgrenadeweapon || weapon.name == "knife" || IsSubStr(weapon.name, "upgraded") || weapon.name == "none")
-                                if(MakeLocalizedString(weapon.displayname) == "" || weapon.isgrenadeweapon || (IsSubStr(weapon.name, "upgraded") && !IsSubStr(weapon.name, "staff")) || weapon.name == "none")
+                                // if(MakeLocalizedString(weapon.displayname) == "" || weapon.isgrenadeweapon || (IsSubStr(weapon.name, "upgraded") && !IsSubStr(weapon.name, "staff")) || weapon.name == "none")
+                                if(weapon.isgrenadeweapon || (IsSubStr(weapon.name, "upgraded") && !IsSubStr(weapon.name, "staff")) || weapon.name == "none")
+                                {
+                                    str = (MakeLocalizedString(weapon.displayname) != "" || weapon.displayname != "") ? weapon.displayname : weapon.name;
                                     continue;
+                                }
                                 else if(weapon.isequipment || weapon.isriotshield || weapon.isgrenadeweapon || zm_utility::is_placeable_mine(weapon))
                                     continue;
                                 
                                 // Pistols
                                 if(!IsInArray(pistols, weapon.name) && !IsInArray(specials, weapon) && zm_utility::GetWeaponClassZM(weapon) == "weapon_pistol")
-                                    specials[specials.size] = weapon;
+                                {
+                                    if(isdefined(player.weaponsVariant) && player.weaponsVariant)
+                                    {
+                                        if(zm_weapons::can_upgrade_weapon(weapon))
+                                            weapon = zm_weapons::get_upgrade_weapon(weapon);
+                                        specials[specials.size] = weapon;
+                                    }
+                                    else
+                                        specials[specials.size] = weapon;
+                                }
                                 // Every other weapon to their respective category
                                 else if(zm_utility::GetWeaponClassZM(weapon) == "weapon_" + weaponsVar[index])
+                                {
+                                    if(isdefined(player.weaponsVariant) && player.weaponsVariant)
+                                    {
+                                        weapon = zm_weapons::get_upgrade_weapon(weapon);
                                         self addOptBool(player hasWeapon2(weapon), weapon.displayname, ::givePlayerWeapon, weapon, player);
+                                    }
+                                    else
+                                        self addOptBool(player hasWeapon2(weapon), weapon.displayname, ::givePlayerWeapon, weapon, player);
+                                }
                             }
                     }
                 }

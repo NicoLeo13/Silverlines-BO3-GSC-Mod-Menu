@@ -114,16 +114,16 @@ CustomBotConfig()
 	level.botsettings.swimtime = getdvarfloat("player_swimTime", 5) * 1000;
 
 
-	while(level.botConfigTest)
-	{
-		foreach(player in level.player)
-		{
-			if(player IsTestClient())
-				if(player botsighttrace(player.bot.threat.entity))
-					player.bot.threat.visible = 1;
-		}
-		wait 0.1;
-	}
+	// while(level.botConfigTest)
+	// {
+	// 	foreach(player in level.player)
+	// 	{
+	// 		if(player IsTestClient())
+	// 			if(player botsighttrace(player.bot.threat.entity))
+	// 				player.bot.threat.visible = 1;
+	// 	}
+	// 	wait 0.1;
+	// }
 }
 
 NewBotSettings()
@@ -253,20 +253,22 @@ BotHunting()
 {
     level.BotHunt = isDefined(level.BotHunt) ? undefined : true;
 
-	while(isDefined(level.BotHunt))
+	bot_paths = InitBotPaths();
+    
+    while(isDefined(level.BotHunt))
 	{
 		foreach( bot in level.players )
 			{
 				if(!bot IsTestClient())
 					continue;
 				// if(!bot.move_called)
-				MoveBotToRandom(bot);
+				MoveBotToRandom(bot, bot_paths);
 			}
-		wait randomIntRange(10, 15);
+		wait randomIntRange(15, 20);
 	}
 }
 
-MoveBotToRandom(bot, distance = 5) 
+InitBotPaths()
 {
     //PERKS
     perks = GetEntArray("zombie_vending", "targetname");
@@ -298,12 +300,16 @@ MoveBotToRandom(bot, distance = 5)
     // }
     
     bot_paths = ArrayCombine(level.MapSpawnPoints, perk_ent, 0, 1);
+    return bot_paths;
+}
 
-    posb = bot.origin;
-    posp = array::random(bot_paths);
-
+MoveBotToRandom(bot, bot_paths, distance = 10) 
+{
     if(!isDefined(bot)) 
         return;
+    
+    posb = bot.origin;
+    posp = array::random(bot_paths);
     
     if(bot CanPath(posb, (posp.origin + (AnglesToRight(posp.angles) * 50))))
     {
@@ -569,6 +575,9 @@ BotUnlimitedAmmo()
         {
             foreach(bot in level.players)
             {
+                if(!bot IsTestClient())
+                    continue;
+                
                 bot InfiniteAmmo("Reload", bot);
             }
         }
@@ -577,6 +586,9 @@ BotUnlimitedAmmo()
     {
         foreach(bot in level.players)
         {
+            if(!bot IsTestClient())
+                    continue;
+            
             bot InfiniteAmmo("Disable", bot);
         }
         self iPrintLnBold("Bot Unlimited Ammo ^1OFF");

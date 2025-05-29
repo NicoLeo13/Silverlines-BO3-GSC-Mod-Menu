@@ -270,6 +270,12 @@ defineVariables()
     //Menu Design Variables
     self thread LoadMenuVars();
     // self thread LoadConstants();
+
+    // self.menuWeapons = [];
+    self.menuWeapons = ArrayCopy(level.zombie_weapons);
+    // weapons = GetArrayKeys(level.zombie_weapons);
+    // for(i = 0; i < weapons.size; i++)
+    //     array::add(self.menuWeapons, weapons[i], 0);
 }
 
 LoadMenuColorsnFades()

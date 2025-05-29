@@ -51,7 +51,7 @@ DoBackgroundSize()
     {
         self.menu["ScrollbarLastPos"][self getCurrentMenu()] = 100;
         self.menu["Cursor"][self getCurrentMenu()] = 0;
-        self iPrintLnBold("Size ^5Changed");
+        // self iPrintLnBold("Size ^5Changed");
     }
     
     if(menuSize > self getMaxCursor())

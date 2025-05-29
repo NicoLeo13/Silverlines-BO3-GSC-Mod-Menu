@@ -491,7 +491,6 @@ ArrayToString(array, additionalStrs = undefined)
     // Shoudl be passed as a string separated by ";, not an array
     if(isDefined(additionalStrs))
         str += additionalStrs;
-    self iPrintLnBold(str);
     
     for(a = 0; a < array.size; a++)
     {
@@ -500,7 +499,6 @@ ArrayToString(array, additionalStrs = undefined)
         if(a != (array.size - 1))
             str += ";";
     }
-    self iPrintLnBold(str);
     return str;
 }
 

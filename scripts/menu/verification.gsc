@@ -82,7 +82,7 @@ setVerification(a, player, msg, force)
 
 UnverifyChecks()
 {
-    self iPrintLnBold("Entered checks");
+    // self iPrintLnBold("Entered checks");
     if(isDefined(self.menu["Instructions"]))
     {
         self thread SetMenuInstructions();    //  To Turn them off
